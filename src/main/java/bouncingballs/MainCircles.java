@@ -9,17 +9,19 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class MainCircles extends Application {
 
-    private Canvas canvas = new Canvas(1000, 1000);
+    private Canvas canvas = new Canvas();
     private LogicHandler logic = new LogicHandler(canvas);
-    private final BorderPane root = new BorderPane();
+    private final VBox root = new VBox();
 
     public static void main(String[] args) {
         launch(args);
@@ -27,12 +29,6 @@ public class MainCircles extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, t -> {
-            for (int i = 0; i < 10; i++) {
-                logic.generateCircle(t.getX(), t.getY());
-            }
-        });
-
         Timeline animation = new Timeline(new KeyFrame(Duration.millis(5), kv -> {
             logic.drawCircles();
         }));
@@ -40,9 +36,9 @@ public class MainCircles extends Application {
 
         animation.play();
 
-        root.setCenter(canvas);
+        root.getChildren().add(canvas);
 
-        Scene scene = new Scene(root, 1000, 1000);
+        Scene scene = new Scene(root, 800, 800);
         primaryStage.setScene(scene);
 
         primaryStage.widthProperty().addListener((obs, oldVal, newVal) -> {
@@ -54,26 +50,28 @@ public class MainCircles extends Application {
         });
 
         primaryStage.setTitle("DVD Logo");
-        primaryStage.setResizable(false);
+        primaryStage.getIcons().add(new Image(("file:icon.png")));
+        primaryStage.setIconified(true);
         primaryStage.show();
     }
 
     void updateCanvasSize(String change, Number newVal) {
         switch (change) {
             case "height":
-                canvas = new Canvas(newVal.doubleValue(), canvas.getHeight());
+                canvas = new Canvas(canvas.getWidth(), newVal.doubleValue());
                 break;
 
             case "width":
-                canvas = new Canvas(canvas.getWidth(), newVal.doubleValue());
+                canvas = new Canvas(newVal.doubleValue(), canvas.getHeight());
                 break;
         }
-        logic = new LogicHandler(canvas);
+        logic.changeSize(canvas);
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, t -> {
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < (int) (Math.random() * 25); i++) {
                 logic.generateCircle(t.getX(), t.getY());
             }
         });
-        root.setCenter(canvas);
+        root.getChildren().remove(0, 1);
+        root.getChildren().add(canvas);
     }
 }

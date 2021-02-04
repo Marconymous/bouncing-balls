@@ -22,25 +22,36 @@ public class LogicHandler {
     public void changeSize(Canvas canvas) {
         this.canvas = canvas;
         this.gc = canvas.getGraphicsContext2D();
+        for (Circle c : circles) {
+            c.setX(canvas.getWidth() / 2 - c.getRadius());
+            c.setY(canvas.getHeight() / 2 - c.getRadius());
+        }
     }
 
     void generateCircle(double x, double y) {
-        circles.add(new Circle((float) Math.random() * 2 - 1, (float) Math.random() * 2 - 1, x, y, (int) (Math.random() * 50), getRandColor()));
+        float speedX = (float) (Math.random() * 2 - 1);
+        float speedY = (float) (Math.random() * 2 - 1);
+        int size;
+        do {
+            size = (int) (Math.random() * 50);
+        } while (size < 10);
+        Color randColor = getRandColor();
+
+        circles.add(new Circle(speedX, speedY, x, y, size, randColor));
     }
 
     void drawCircles() {
-        gc.setFill(ALICEBLUE);
+        gc.setFill(BLACK);
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         for (Circle c : circles) {
             move(c);
             gc.setFill(c.getColor());
             gc.fillOval(c.getX(), c.getY(), c.getRadius() * 2, c.getRadius() * 2);
-            System.out.println(c.toString());
         }
     }
 
     void move(Circle c) {
-        if (c.getX() + c.getRadius() * 2 >= 1000) {
+        if (c.getX() + c.getRadius() * 2 + 15 >= canvas.getWidth()) {
             c.setSpeedX(c.getSpeedX() - 2 * c.getSpeedX());
         }
 
@@ -48,7 +59,7 @@ public class LogicHandler {
             c.setSpeedX(c.getSpeedX() - 2 * c.getSpeedX());
         }
 
-        if (c.getY() + c.getRadius() * 2 >= 1000) {
+        if (c.getY() + c.getRadius() * 2 + 38 >= canvas.getHeight()) {
             c.setSpeedY(c.getSpeedY() - 2 * c.getSpeedY());
         }
 
